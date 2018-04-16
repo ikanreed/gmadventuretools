@@ -26,7 +26,7 @@ SECRET_KEY = 'l4j*_su9qz2#zd%pk)+bb)1e@q%zm!khu_-3(5x-7sn14)v6v_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['dmtools.ikanreed.net']
 
 
 # Application definition
