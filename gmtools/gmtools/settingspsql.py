@@ -51,7 +51,7 @@ DATABASES = {
         'NAME': 'gmtools',
         'USER':'gmtools',
         'PASSWORD':'gmdb1',
-        'HOST':'ikanreed.net',
+        'HOST':'localhost',
         'PORT':'5432'
     }
 }
