@@ -32,7 +32,6 @@ class InformationBlock(models.Model):
     def render(self, block, request, isedit):
         wrap=ProviderDictionary(block)
         template=self.template(isedit)
-        log(type(template))
         if template:
             return template.render(wrap, None)
         else:
@@ -205,9 +204,6 @@ class MonsterBaseBlock(InformationBlock):
             return loader.get_template('showblock/MonsterSummary.html')
 
 
-def log(value):
-    with open('output.out','w+') as log:
-        log.write(repr(value)+"\n")
 
 
 class ProviderDictionary(dict):
@@ -217,7 +213,6 @@ class ProviderDictionary(dict):
         else:
             self.wrapped=ProviderWrapper(wrapped)
     def __getitem__(self, key):
-        log("trying to fetch key %s"%key)
         return self.provide_value(key)
     def __contains__(self, key):
         return self.provide_value(key) is not None
