@@ -1,0 +1,10 @@
+{% extends 'base_block.html' %}
+{% block title %}All block groups{% endblock %}
+
+{% block content %}
+  {% for blockgroup in blockgroups %}
+    <p>
+      <a href="{% url 'showblock' blockgroup.id %}">{{ blockgroup.summary }}</a>
+    </p>
+  {% endfor %}
+{% endblock %}

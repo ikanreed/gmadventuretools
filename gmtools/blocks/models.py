@@ -1,6 +1,7 @@
 
 from django.db import models
 from model_utils.managers import InheritanceManager
+from django.template import loader
 #from gmtools.utils import dice
 from utils import dice
 from utils.mathutils import lerp
@@ -27,6 +28,17 @@ class InformationBlock(models.Model):
     '''return a set of stats that this needs to have fulfilled to be fully descibed'''
     def requires(self):
         return set()
+
+    def render(self, block, request, isedit):
+        wrap=ProviderDictionary(block)
+        template=self.template(isedit)
+        log(type(template))
+        if template:
+            return template.render(wrap, None)
+        else:
+            return ""
+    def template(self,isedit):
+        return None
 
 class Trait(InformationBlock):
     name=models.CharField(max_length=80)
@@ -67,6 +79,9 @@ class MonsterType(InformationBlock):
 
     def __str__(self):
         return self.name
+    def template(self, isedit):
+        return None
+
 
 class StatsBlock(InformationBlock):
     strength=models.IntegerField()
@@ -92,6 +107,14 @@ class StatsBlock(InformationBlock):
         return (value-10)//2
 
     #no point overriding str with a bunch of nonsense about our stats
+class AlignmentBlock(InformationBlock):
+    lawchaos=models.CharField(max_length=1, choices=(('L','Lawful'),('N','Neutral'),('C','Chaotic')))
+    goodevil=models.CharField(max_length=1, choices=(('G','Good'),('N','Neutral'),('E','Evil')))
+    def provide(self, statname, provider, excludeList):
+        if statname=="alignment":
+            if self.lawchaos==self.goodevil:
+                return "N"
+            return self.lawchaos+self.goodevil
 
 class MonsterBaseBlock(InformationBlock):
     #we don't know of any important features to set
@@ -99,6 +122,7 @@ class MonsterBaseBlock(InformationBlock):
     HD=models.IntegerField()
     speed=models.IntegerField()
     CR=models.IntegerField(null=True)
+    name=models.CharField(max_length=80)
 
     def calc_save(self, good, stat, CR):
         if good:
@@ -148,25 +172,94 @@ class MonsterBaseBlock(InformationBlock):
             diff=cr20hd-20
             a=(diff-1)/400
             return round(((4*a*(hdDice-1)+1)**0.5-1)/(2*a))
+        if statname=="XP":
+            if(provider.CR is not None):
+                if(provider.CR>0):
+                    sum=400
+                    for i in range(1,provider.CR):
+                        added=2**((i+1)//2)*100
+                        sum+=added
+                    return sum
+                elif CR==0:
+                    return 200
+                else:#technically lower is possible
+                    return 100
+        if statname=="CRText":
+            cr=provider.CR
+            if cr>0:
+                return str(cr)
+            elif cr==0:
+                return "1/2"
+            elif cr==-1:
+                return "1/4"
+            elif cr<-1:
+                return "1/8"#it doesn't get any easier than that
+        if statname=="initiative":
+            return provider.DEX
+        if statname=="name":
+            return self.name
+    def template(self, isedit):
+        if isedit:
+            return loader.get_template('editblock/MonsterSummary.html')
+        else:
+            return loader.get_template('showblock/MonsterSummary.html')
 
 
+def log(value):
+    with open('output.out','w+') as log:
+        log.write(repr(value)+"\n")
 
-    #just inherit default requires
+
+class ProviderDictionary(dict):
+    def __init__(self, wrapped):
+        if isinstance(wrapped,  ProviderWrapper):
+            self.wrapped=wrapped
+        else:
+            self.wrapped=ProviderWrapper(wrapped)
+    def __getitem__(self, key):
+        log("trying to fetch key %s"%key)
+        return self.provide_value(key)
+    def __contains__(self, key):
+        return self.provide_value(key) is not None
+    def provide_value(self, name, rootprovider=None, excludeList=set()):
+        return self.wrapped.provide_value(name, rootprovider,excludeList)
 
 class ProviderWrapper:
     def __init__(self, wrapped):
         self.wrapped=wrapped
+        self.cache={}
     def provide_value(self, name, rootprovider=None, excludeList=set()):
-        return self.wrapped.provide_value(name, rootprovider,excludeList)
+        #we could infinite lookup prevent too...
+        if name in self.cache:
+            return self.cache[name]
+        result= self.wrapped.provide_value(name, rootprovider,excludeList)
+        self.cache[name]=result
+        return result
     def __getattr__(self, name):
-        return self.provide_value(name)
+        if name=='wrapped' or name=="cache":
+            return super().__getattr__(name)
+        return self.provide_value(name,self)
+
+    """
+    def items(self):
+        raise Exception("no")
+    def keys(self):
+        raise Exception("why")
+    def copy(self):
+        raise Exception("who is doing this")
+    def fromkeys(self):
+        raise Exception("")
+    def get(self, item, default=None):
+        raise Exception("alright")
+    pop=get
+    setdefault=get"""
 
 class BlockGroup(models.Model):
     #does this actually store anything about the group of blocks?
     #at all?
     blocks=models.ManyToManyField(InformationBlock, related_name="groups", blank=True)
     #okay we want to know if there's something we're extending
-    base_group=models.ForeignKey('BlockGroup', related_name="inheritors", null=True, on_delete= models.CASCADE)
+    base_group=models.ForeignKey('BlockGroup', related_name="inheritors", null=True, blank=True, on_delete= models.CASCADE)
     def all_blocks(self):
         result= [x for x in self.blocks.select_subclasses()]
         if(self.base_group is not None):
@@ -193,3 +286,6 @@ class BlockGroup(models.Model):
             return self.base_group.provide_value(statname, rootprovider, excludeList)
         #explicit, but this intended if nothing found
         return None
+    def summary(self):
+        wrap=ProviderWrapper(self)
+        return wrap.name or wrap.description or wrap.type+"("+str(wrap.CR)+")"

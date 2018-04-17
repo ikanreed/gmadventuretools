@@ -1,0 +1,7 @@
+{% extends 'base_block.html' %}
+{% block title %}{{group.summary}}{%endblock%}
+{%block content%}
+  {%for block in blocks%}
+    {{block|safe}}
+  {%endfor%}
+{%endblock%}

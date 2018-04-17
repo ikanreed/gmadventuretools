@@ -1,0 +1,31 @@
+{% load static %}
+<html>
+  <head>
+    <link rel="stylesheet" href="{% static "gmtools.css" %}" />
+    <link rel="stylesheet" href="{% static "blocks/blockstyle.css" %}" />
+    <title>{% block title %}GM Tool: Blocks{% endblock %}</title>
+  </head>
+  <body>
+    <div class="pageheader">
+    </div>
+    <div class="navleft">
+      {# now link to all top level areas #}
+      <ul>
+        <li><a href="{% url 'listblocks' %}">All block groups</a></li>
+      </ul>
+
+      {# now link to all block related top level areas #}
+      <ul>
+
+      </ul>
+
+      {# now link to the stuff that any ineritors want to provide #}
+      {% block locallinks %}{% endblock %}
+    </div>
+    <div class="content" id="content">
+      {% block content %}No content available.{% endblock %}
+    </div>
+    <div class="pagefooter">
+    </div>
+  </body>
+</html>

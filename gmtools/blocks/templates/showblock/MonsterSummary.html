@@ -1,0 +1,15 @@
+{%load humanize%}
+<div class="topbar"> {{name|upper}} {{CRText}}</div>
+<div class="blocktext">
+  <p>XP {{XP|intcomma}}</p>
+  <p>{{alignment}} {{size}} {{type}}</p>
+  <p>
+    <b>Init</b> {{initiative}};
+    <b>Senses</b>
+     {% if lowlight %} low-light vision {% endif %}
+     {% if darkvision %} darkvision {{darkvision}} ft {% endif %}
+     {% if scent %} scent {% endif %}
+     {% if blindsight %} blindsight {{blindsight}} ft {% endif %}
+     Perception: {{Perception}}
+  </p>
+</div>

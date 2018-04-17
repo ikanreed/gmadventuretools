@@ -1,0 +1,52 @@
+body
+{
+  margin: 0;
+}
+
+div.pageheader
+{
+  background-image: linear-gradient(to right, #806060,#606060);
+  width: 100%;
+  height: 50px;
+}
+
+div.pagefooter
+{
+  background-image: linear-gradient(to right, #806060,#606060);
+  width: 100%;
+  height: 50px;
+  clear:both;
+}
+
+div.navleft
+{
+  width: 200px;
+  height: 100%;
+  background-color: #806060;
+  float:left;
+  margin: 0;
+  padding: 0;
+}
+
+div.navleft li
+{
+  list-style-type: none;
+}
+
+div.navleft li a
+{
+  color: white;
+  text-decoration: none;
+  font-size: 14pt;
+  font-weight: bold;
+}
+
+
+div.content
+{
+  margin-left: 200px;
+  padding-left: 20px;
+  padding-top: 40px;
+  padding-right: 40px;
+  
+}

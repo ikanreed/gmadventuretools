@@ -95,3 +95,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT="/var/www/dmtools"
+STATICFILES_DIRS=settings.STATICFILES_DIRS
