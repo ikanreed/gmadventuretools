@@ -19,6 +19,12 @@ class DieRoll:
         return sum(random.randint(1,self.sides) for x in range(self.count))
     def countDice(self):
         return self.count
+    def getdierollobjects(self):
+        yield self
+    def toDiceString(self):
+        if self.count>1:
+            return "%sd%s"%(self.count,self.sides)
+        return "d%s"%self.sides
 
 class Constant:
     def __init__(self, value):
@@ -33,6 +39,12 @@ class Constant:
         return self.value
     def countDice(self):
         return 0
+    def getdierollobjects(self):
+        return
+        yield
+    def toDiceString(self):
+        return str(self.value)
+
 class Sum:
     def __init__(self,left, right):
         self.left=left
@@ -48,8 +60,14 @@ class Sum:
     def roll(self):
         return self.left.roll()+self.right.roll()
     def countDice(self):
-
         return self.left.countDice()+self.right.countDice()
+    def getdierollobjects(self):
+        for leftroll in self.left.getdierollobjects():
+            yield leftroll
+        for rightroll in self.right.getdierollobjects():
+            yield rightroll
+    def toDiceString(self):
+        return "%s + %s"%(self.left.toDiceString(), self.right.toDiceString())
 class Difference:
     def __init__(self,left, right):
         self.left=left
@@ -68,6 +86,15 @@ class Difference:
         #reallllllllllllllly uncertain here
         #do we add or subtract, i guess add?
         return self.left.countDice()+self.right.countDice()
+    def getdierollobjects(self):
+        for leftroll in self.left.getdierollobjects():
+            yield leftroll
+        for rightroll in self.right.getdierollobjects():
+            yield rightroll
+    def toDiceString(self):
+        if isinstance(self.right, Constant) or isinstance(self.right, DieRoll):
+            return "%s - %s"%(self.left.toDiceString(), self.right.toDiceString())
+        return "%s - (%s)"%(self.left.toDiceString(), self.right.toDiceString())
 
 class MultiRoll:
     def __init__(self, left, right):
@@ -95,6 +122,17 @@ class MultiRoll:
             return self.right.countDice()*self.left.avg()
         else:
             return 0
+
+    def getdierollobjects(self):
+        for leftroll in self.left.getdierollobjects():
+            yield leftroll
+        for rightroll in self.right.getdierollobjects():
+            yield rightroll
+    def toDiceString(self):
+        if isinstance(self.left,Constant):
+            #most common usage of this
+            return "%s*(%s)"(self.left.toDiceString(),self.right.toDiceString())
+        return "(%s)*(%s)"%(self.left.toDiceString(), self.right.toDiceString())
 class BulkDieRoll:
     dietokenizer=Tokenizer(
         atom('(?P<count>[0-9]*)d(?P<sides>[0-9]+)',DieRoll),
@@ -121,5 +159,9 @@ class BulkDieRoll:
         return self.root.roll()
     def countDice(self):
         return self.root.countDice()
+    def getDieRollObjects(self):
+        return self.root.getdierollobjects()
     def getMultipleRoll(self, times):
         return BulkDieRoll(MultiRoll(times,self.root))
+    def toDiceString(self):
+        return self.root.toDiceString()

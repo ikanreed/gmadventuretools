@@ -11,7 +11,7 @@ class Tokenizer:
             if token.CanMatch(tokenString):
                 return token.BuildToken(tokenString)
             elif token.CanMatch(tokenString.strip()):#purely convenience
-                return token.BuildToken(tokenstring.strip())
+                return token.BuildToken(tokenString.strip())
 
 
 

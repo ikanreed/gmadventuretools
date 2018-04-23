@@ -1,0 +1,62 @@
+{%load humanize%}
+{%load dndfilters%}
+<div class="subbar">OFFENSE</div>
+<div class="blocktext">
+  <p>
+    <b>Speed</b> {{speed}} ft.
+    {%if swimspeed %}, swim {{swimspeed}} ft.{%endif%}
+    {%if flyspeed %}, fly {{flyspeed}} ft.{%endif%}
+    {%if burrowspeed %}, burrow {{burrowspeed}} ft.{%endif%}
+    {%if climbspeed %}, burrow {{climbspeed}} ft.{%endif%}
+  </p>
+  {%if attacks %}
+    {% for attackgroup in attacks.items %}
+      <p>
+        <b>{{attackgroup.0.0|capfirst}}</b>
+          {% for attack in attackgroup.1 %}
+            {%if attack.count > 1 %}{{attack.count}}{%endif%}
+            {{attack.name}}
+            {{attack.bonus|bonus}}
+            ({{attack.damageroll}}{% if attack.critical %}/{{attack.critical}}{%endif%}{%if attack.addedeffect %} plus {{attack.addedeffect}}{%endif%}),
+          {% endfor %}
+      </p>
+    {%endfor%}
+  {%endif%}
+  {%if specialattacks %}
+  <p>
+    <b>Special attacks</b>
+    {%for specialattack in specialattacks%}
+      {{specialattack.name}}&mdash;{{specialattack.description}}
+    {%endfor%}
+  </p>
+  {%endif%}
+  {%if space or reach %}
+  <p>
+    <b>Space</b> {{space}} ft.;  <b>Reach</b> {{reach}} ft.
+  </p>
+  {%endif%}
+  {%if spelllikes %}
+  <p>
+    <b> Spell-Like Abilities</b>
+    <br />
+    (CL {{HD|ordinal}})
+    {%for spelllike in spelllikes%}
+      {{spelllike.rate}}&mdash;<i>{{spelllike.spell.name}}</i>(DC: {{spelllike.DC}})
+    {%endfor%}
+  </p>
+  {%endif%}
+  {%if spells %}
+  <p>
+    {% for spellbook in spells %}
+      <b>Spells Known</b> (CL {{spellbook.CL|ordinal}})
+      {%for spelllevel in spellbook%}
+        {{spelllevel.level|ordinal}}({{spelllevel.count}}/day)&mdash;
+          {%for spell in spelllevel.prepared%}<i>{{spell.name}}</i>, {%endfor%}
+          <br/>
+      {%endfor%}
+    {%endfor%}
+  </p>
+  {%endif%}
+
+
+</div>

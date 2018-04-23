@@ -1,0 +1,40 @@
+div.subbar
+{
+  font-size: 10pt;
+  font-family: sans-serif;
+  border-top:  black solid 1px;
+  border-bottom: black solid 1px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+
+div.topbar
+{
+  background-color: #206020;
+  color: white;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  font-weight: bold;
+
+}
+
+.topbar .right
+{
+  float: right;
+  margin-right: 100px
+}
+
+div.blocktext
+{
+
+}
+
+div.blocktext p
+{
+  margin-top: 0;
+  margin-bottom: 6px;
+}

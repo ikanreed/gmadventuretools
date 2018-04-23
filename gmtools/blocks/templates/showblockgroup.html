@@ -1,0 +1,16 @@
+{% extends 'base_block.html' %}
+{% block title %}{{group.summary}}{%endblock%}
+{%block content%}
+  {%for block in blocks%}
+    {{block|safe}}
+  {%endfor%}
+  {%if missingvalues%}
+    <h3>the following required values were not provided</h3>
+    <ul class="missing">
+    {%for missed in missingvalues%}
+      <li>{{missed}}</li>
+    {%endfor%}
+    </ul>
+  {%endif%}
+
+{%endblock%}

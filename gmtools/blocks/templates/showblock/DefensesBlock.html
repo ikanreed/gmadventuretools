@@ -1,0 +1,22 @@
+{%load dndfilters%}
+<div class="subbar">DEFENSE</div>
+<div class="blocktext">
+  <p><b>AC</b> {{AC}}, touch {{touch}}, flat-flooted {{flatfooted}}
+    {%if armorbonus or DEX or dodge or NaturalArmor or sizemod %}
+    (
+      {%if armorbonus %} {{armorbonus|bonus}} armor {%endif%}
+      {%if DEX %} {{DEX|bonus}} dex {%endif%}
+      {%if dodge %} {{dodge|bonus}} dodge {%endif%}
+      {%if NaturalArmor %} {{NaturalArmor|bonus}} natural {%endif%}
+      {%if sizemod %} {{sizemod|bonus}} size {%endif%}
+    )
+    {%endif%}
+  </p>
+  <p> <b>HP</b> {{HP}} ({{HDText}})</p>
+  <p> <b>Fort</b> {{fort|bonus}}, <b>Ref</b> {{ref|bonus}}, <b>Will</b> {{will|bonus}}</p>
+  {%if DefensiveTraits %}
+    {% for trait in DefensiveTraits %}
+      <p><b>{{trait.name}}</b> - {{trait.description}}</p>
+    {%endfor%}
+  {%endif%}
+</div>

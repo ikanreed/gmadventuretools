@@ -10,5 +10,10 @@ def listblocks(request):
 
 def showblock(request, group_id):
     group=get_object_or_404(models.BlockGroup, pk=group_id)
-    context={'group':group, 'blocks': [x.render(group,request,False) for x in group.blocks.select_subclasses()]}
-    return render(request, 'editblockgroup.html', context)
+    missingvalues=[]
+    group.reportMissing=missingvalues.append
+    context={'group':group,
+        'blocks': [x.render(group,request,False) for x in sorted(group.blocks.select_subclasses(),
+            key=lambda x:x.displayorder)],
+        'missingvalues':missingvalues}
+    return render(request, 'showblockgroup.html', context)
