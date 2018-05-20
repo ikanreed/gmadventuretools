@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'blocks.apps.BlocksConfig'
+    'blocks.apps.BlocksConfig',
     'blockwizard.apps.BlockwizardConfig'
 ]
 
