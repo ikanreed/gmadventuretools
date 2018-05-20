@@ -24,11 +24,11 @@ class BlockType(models.Model):
 class PointAllocatorType(models.Model):
     name=models.CharField(max_length=80)
     unspentpointfieldname=models.CharField(max_length=80)
-    blocktype=Models.ForeignKey(BlockType)
+    blocktype=models.ForeignKey(BlockType, on_delete=models.CASCADE )
 
 class PointAllocator(models.Model):
     name=models.CharField(max_length=80)
-    allocationType=models.ForeignKey(PointAllocatorType)
+    allocationType=models.ForeignKey(PointAllocatorType, on_delete=models.CASCADE)
     filteritem=models.CharField(max_length=200)
     getsortvalforitem=models.CharField(max_length=200)
 
@@ -52,4 +52,4 @@ class WizardBlock(models.Model):
 
         return SharedBlock.objects.filter()
     class Meta:
-        unique_togheter=(('wizard', 'orderIndex'),)
+        unique_together=(('wizard', 'orderIndex'),)
