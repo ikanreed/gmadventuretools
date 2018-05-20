@@ -19,4 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('blocks/',include('blocks.urls'))
+    path('wizards/',include('blockwizard.urls'))
 ]

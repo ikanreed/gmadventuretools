@@ -3,6 +3,7 @@ from django.db import models
 import sys
 from model_utils.managers import InheritanceManager
 from django.template import loader
+from django.conf import settings
 import math
 #from gmtools.utils import dice
 from utils import dice
@@ -19,7 +20,9 @@ whether they be stat blocks, ability blocks, feat blocks
 description blocks, summary blocks, whatever
 '''
 class InformationBlock(models.Model):
-
+    owner=models.ForeignKey(settings.AUTH_USER_MODEL, default=None, null=True, on_delete=models.SET_NULL)
+    created=models.DateTimeField(auto_now_add=True)
+    modified=models.DateTimeField(auto_now=True)
     #name=models.CharField(max_length=256)
     priority=10
     displayorder=0
@@ -61,19 +64,18 @@ class InformationBlock(models.Model):
         else:
             return super().__str__()
 
-class SharedBlock(models.Model):
-    block=models.ForeignKey(InformationBlock, related_name="shared_as", on_delete=models.CASCADE)
+
+
+class Feat(InformationBlock):
     name=models.CharField(max_length=80)
-    @staticmethod
-    def get_shared_query(BlockType, **kwQueryArgs):
-        if kwQueryArgs:
-            possibleTargets=BlockType.objects.filter(**kwQueryArgs)
-        else:
-            possibleTargets=BlockType.objects.all()
-        possibleTargets=possibleTargets.filter(shared_as__in=SharedBlock.objects.all())
-        return possibleTargets
-
-
+    description=models.CharField(max_length=1800)
+    prerequisite_feats=models.ManyToManyField("Feat", related_name="prerequisite_for")
+    prerequisiteExpression=models.CharField(max_length=200)
+    def prerequisites_met(self,provider):
+        newExclude={self}
+        localproxy=ProviderDictionary(provider,newExclude)
+        #kicking security mistakes into high gear
+        return eval(expr, {}, localproxy)
 
 class Weapon(InformationBlock):#it's an information block, but not for a monster
     name=models.CharField(max_length=80)
